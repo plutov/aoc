@@ -1,2 +1,1 @@
-# aoc
-My AdventOfCode solutions
+# My [AdventOfCode](https://adventofcode.com/) solutions
