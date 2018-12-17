@@ -160,7 +160,17 @@ var ops = map[string]op{
 	},
 }
 
+var opNumbers map[string][]int
+
 func main() {
+	answer1 := getAnswerOne()
+	fmt.Printf("Answer 1: %d\n", answer1)
+
+	answer2 := getAnswerTwo()
+	fmt.Printf("Answer 2: %d\n", answer2)
+}
+
+func getAnswerOne() int {
 	var samples []sample
 
 	samplesFile, _ := os.Open("./samples")
@@ -182,7 +192,7 @@ func main() {
 	}
 
 	var moreThanThree int
-	opAnNumber := make(map[string][]int)
+	opNumbers = make(map[string][]int)
 	for _, s := range samples {
 		var successfull int
 		for _, op := range ops {
@@ -195,13 +205,13 @@ func main() {
 			if reflect.DeepEqual(after, s.after) {
 				successfull++
 
-				_, ok := opAnNumber[op.Name]
+				_, ok := opNumbers[op.Name]
 				if !ok {
-					opAnNumber[op.Name] = []int{}
+					opNumbers[op.Name] = []int{}
 				}
 
-				if !intInSlice(opAnNumber[op.Name], s.op[0]) {
-					opAnNumber[op.Name] = append(opAnNumber[op.Name], s.op[0])
+				if !intInSlice(opNumbers[op.Name], s.op[0]) {
+					opNumbers[op.Name] = append(opNumbers[op.Name], s.op[0])
 				}
 			}
 		}
@@ -211,11 +221,13 @@ func main() {
 		}
 	}
 
-	fmt.Printf("Answer 1: %d\n", moreThanThree)
+	return moreThanThree
+}
 
+func getAnswerTwo() int {
 	var foundOps []int
 	for len(foundOps) < len(ops) {
-		for name, o := range opAnNumber {
+		for name, o := range opNumbers {
 			var uniqueN []int
 			for _, n := range o {
 				if !intInSlice(foundOps, n) {
@@ -253,9 +265,8 @@ func main() {
 		}
 	}
 
-	fmt.Printf("Answer 2: %d\n", start[0])
+	return start[0]
 }
-
 func intInSlice(s []int, n int) bool {
 	for _, i := range s {
 		if i == n {
