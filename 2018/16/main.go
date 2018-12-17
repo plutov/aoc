@@ -16,84 +16,72 @@ type sample struct {
 }
 
 type op struct {
-	Name string
-	N    int
-	F    func(op, before, after []int) []int
+	N int
+	F func(op, before, after []int) []int
 }
 
 var ops = map[string]op{
 	"addr": op{
-		Name: "addr",
 		F: func(op, before, after []int) []int {
 			after[op[3]] = before[op[1]] + before[op[2]]
 			return after
 		},
 	},
 	"addi": op{
-		Name: "addi",
 		F: func(op, before, after []int) []int {
 			after[op[3]] = before[op[1]] + op[2]
 			return after
 		},
 	},
 	"mulr": op{
-		Name: "mulr",
 		F: func(op, before, after []int) []int {
 			after[op[3]] = before[op[1]] * before[op[2]]
 			return after
 		},
 	},
 	"muli": op{
-		Name: "muli",
 		F: func(op, before, after []int) []int {
 			after[op[3]] = before[op[1]] * op[2]
 			return after
 		},
 	},
 	"banr": op{
-		Name: "banr",
 		F: func(op, before, after []int) []int {
 			after[op[3]] = before[op[1]] & before[op[2]]
 			return after
 		},
 	},
 	"bani": op{
-		Name: "bani",
 		F: func(op, before, after []int) []int {
 			after[op[3]] = before[op[1]] & op[2]
 			return after
 		},
 	},
 	"borr": op{
-		Name: "borr",
 		F: func(op, before, after []int) []int {
 			after[op[3]] = before[op[1]] | before[op[2]]
 			return after
 		},
 	},
 	"bori": op{
-		Name: "bori",
 		F: func(op, before, after []int) []int {
 			after[op[3]] = before[op[1]] | op[2]
 			return after
 		},
 	},
 	"setr": op{
-		Name: "setr",
 		F: func(op, before, after []int) []int {
 			after[op[3]] = before[op[1]]
 			return after
 		},
 	},
 	"seti": op{
-		Name: "seti",
 		F: func(op, before, after []int) []int {
 			after[op[3]] = op[1]
 			return after
 		},
 	},
 	"gtir": op{
-		Name: "gtir",
 		F: func(op, before, after []int) []int {
 			if op[1] > before[op[2]] {
 				after[op[3]] = 1
@@ -104,7 +92,6 @@ var ops = map[string]op{
 		},
 	},
 	"gtri": op{
-		Name: "gtri",
 		F: func(op, before, after []int) []int {
 			if before[op[1]] > op[2] {
 				after[op[3]] = 1
@@ -115,7 +102,6 @@ var ops = map[string]op{
 		},
 	},
 	"gtrr": op{
-		Name: "gtrr",
 		F: func(op, before, after []int) []int {
 			if before[op[1]] > before[op[2]] {
 				after[op[3]] = 1
@@ -126,7 +112,6 @@ var ops = map[string]op{
 		},
 	},
 	"eqir": op{
-		Name: "eqir",
 		F: func(op, before, after []int) []int {
 			if op[1] == before[op[2]] {
 				after[op[3]] = 1
@@ -137,7 +122,6 @@ var ops = map[string]op{
 		},
 	},
 	"eqri": op{
-		Name: "eqri",
 		F: func(op, before, after []int) []int {
 			if before[op[1]] == op[2] {
 				after[op[3]] = 1
@@ -148,7 +132,6 @@ var ops = map[string]op{
 		},
 	},
 	"eqrr": op{
-		Name: "eqrr",
 		F: func(op, before, after []int) []int {
 			if before[op[1]] == before[op[2]] {
 				after[op[3]] = 1
@@ -195,7 +178,7 @@ func getAnswerOne() int {
 	opNumbers = make(map[string][]int)
 	for _, s := range samples {
 		var successfull int
-		for _, op := range ops {
+		for opName, op := range ops {
 			var after []int
 			for _, b := range s.before {
 				after = append(after, b)
@@ -205,13 +188,13 @@ func getAnswerOne() int {
 			if reflect.DeepEqual(after, s.after) {
 				successfull++
 
-				_, ok := opNumbers[op.Name]
+				_, ok := opNumbers[opName]
 				if !ok {
-					opNumbers[op.Name] = []int{}
+					opNumbers[opName] = []int{}
 				}
 
-				if !intInSlice(opNumbers[op.Name], s.op[0]) {
-					opNumbers[op.Name] = append(opNumbers[op.Name], s.op[0])
+				if !intInSlice(opNumbers[opName], s.op[0]) {
+					opNumbers[opName] = append(opNumbers[opName], s.op[0])
 				}
 			}
 		}
@@ -247,9 +230,9 @@ func getAnswerTwo() int {
 
 	start := []int{0, 0, 0, 0}
 	program, _ := os.Open("program")
-	scanner2 := bufio.NewScanner(program)
-	for scanner2.Scan() {
-		line := scanner2.Text()
+	scanner := bufio.NewScanner(program)
+	for scanner.Scan() {
+		line := scanner.Text()
 		if len(line) != 0 {
 			op := lineToIntSlice("", line, " ")
 			for _, o := range ops {
